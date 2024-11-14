@@ -31,6 +31,7 @@ void setup()
 
   //SD
   SD.begin(csPin);                                       //initiate spi communication with chip select pin
+  SPI.begin(sck,MISO,MOSI,csPin);
   createDirectory(SD,"newdir");
   newFileCreate();
   
