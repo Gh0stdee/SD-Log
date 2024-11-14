@@ -29,7 +29,7 @@ void deleteFile(fs::FS &fs, const char* path)
 
 void writeFile(fs::FS &fs, const char* path, const char* message)
 {
-    Serial.println("Writing file.");
+    Serial.println("Writing file.....");
     File data = fs.open(path,FILE_WRITE);
     if(data.print(message))
     {
@@ -44,7 +44,7 @@ void writeFile(fs::FS &fs, const char* path, const char* message)
 
 void appendFile(fs::FS &fs, const char* path, const char* message)
 {
-    Serial.println("Appending file.");
+    Serial.println("Appending file.....");
     File data = fs.open(path,FILE_APPEND);
     if(data.print(message))
     {
@@ -52,7 +52,7 @@ void appendFile(fs::FS &fs, const char* path, const char* message)
     }
     else
     {
-        Serial.println("Message appended.");
+        Serial.println("Message not appended.");
     }
     data.close();
 }
