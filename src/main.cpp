@@ -1,11 +1,8 @@
 #include <Arduino.h>
-#include <ArduinoJson.h>
-#include "SDcode.h"
 #include "pinout.h"
 #include "variables.h"
-
-DynamicJsonDocument doc (2*size_1mb) ; //allocate heap memory(value) to create Json document
-String dataMessage;
+#include <ArduinoJson.h>
+#include "SDcode.h"
 
 //get light value
 int lightValue()
@@ -13,6 +10,8 @@ int lightValue()
   light = analogRead(lightPin);
   return light;
 }  
+DynamicJsonDocument doc (2*size_1mb) ;
+String dataMessage;
 
 //create file if file doesn't exist
 void newFileCreate()
@@ -21,23 +20,32 @@ void newFileCreate()
   if(!file)
   {
     writeFile(SD,"/data.txt","Timestamp, Light \r\n"); // \r\n means go to next line in the file
+    Serial.println("Creating file...");
     file.close();                                      //close the file
   }
 }
 
 void setup() 
 {
-  Serial.begin(9600); 
-
+  Serial.begin(57600);
+  Serial.println("Begin.");
+  delay(1000);
+  SPI.begin(16,5,17,4); //SCK,MISO,MOSI,csPin
+  while (!SD.begin(4))                                       
+  {
+    Serial.println("Error occurred at SD begin");
+    delay(1000);
+  }
   //SD
-  SD.begin(csPin);                                       //initiate spi communication with chip select pin
-  SPI.begin(sck,MISO,MOSI,csPin);
-  createDirectory(SD,"newdir");
+  
+  
   newFileCreate();
   
   //sensor and timer
   pinMode(lightPin, INPUT);
   startTime = millis();
+  Serial.println("check 1 successful");
+
 }
 
 /*
@@ -47,9 +55,10 @@ doc[key] = value -> "key" : value
 void loop() {
   currentTime = millis();
   if ((currentTime-startTime) >= 1000)
-  {
+  { 
     if (doc.memoryUsage() <= size_1mb)    
     {
+      Serial.println("check 2 successful");
       doc["Reading"]["Timestamp"] = currentTime;
       //testing
       Serial.println(currentTime); 
@@ -59,8 +68,9 @@ void loop() {
       dataMessage = String(currentTime) + "," + String(light) +"\r\n";
       appendFile(SD,"/data.txt",dataMessage.c_str());
       //testing
-      Serial.print("Data saved(TimeStamp, Light): ");
-      Serial.println(currentTime, light);
+      //Serial.print("Data saved(TimeStamp, Light): ");
+      //Serial.println(currentTime, light);
+      
       startTime = currentTime; //start the new cycle
       
     }
@@ -68,11 +78,14 @@ void loop() {
     {
       //testing
       Serial.println("Exceeded predetermined size"); 
+      
+      
       doc.clear();
       deleteFile(SD, "/data.txt");
       newFileCreate();
+      startTime = currentTime; //start the new cycle
+      
     }
     
   }
 }
-

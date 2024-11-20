@@ -3,15 +3,18 @@
 #include <SPI.h>
 
 
-void createDirectory(fs::FS &fs, const char* path)
+bool createDirectory(fs::FS &fs, const char* path)
 {
     if(fs.mkdir(path))
     {
         Serial.println("created directory");
+        return true;
     }
     else
     {
         Serial.println("Failed to make directory");
+        delay(1000);
+        return false;
     }
 }
 
