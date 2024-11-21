@@ -3,6 +3,18 @@
 #include "variables.h"
 #include <ArduinoJson.h>
 #include "SDcode.h"
+#include <time.h>
+
+//TimeStamp Fomat Min:Sec
+String getTimestamp()
+{
+  time_t timeInfo = time(NULL);
+  struct tm date =*localtime(&timeInfo);
+  String minute = (String)date.tm_min;
+  String second = (String)date.tm_sec;
+  String timeStamp = (minute +":"+ second);
+  return timeStamp;
+}
 
 //get light value
 int lightValue()
@@ -59,7 +71,7 @@ void loop() {
     if (doc.memoryUsage() <= size_1mb)    
     {
       Serial.println("check 2 successful");
-      doc["Reading"]["Timestamp"] = currentTime;
+      doc["Reading"]["Timestamp"] = getTimestamp();
       //testing
       Serial.println(currentTime); 
       doc["Reading"]["light"] = lightValue();
