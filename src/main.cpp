@@ -4,14 +4,26 @@
 #include <ArduinoJson.h>
 #include "SDcode.h"
 #include <time.h>
+#include <WiFi.h>
 
-//TimeStamp Fomat Min:Sec
+void NTPConnect()
+{
+  WiFi.begin(ssid, pw);
+  while (WiFi.status() != WL_CONNECTED) {
+      delay(500);
+      Serial.print(".");
+  }
+  Serial.println(" CONNECTED");
+  configTime(gmtOffset_sec,daylightOffset_sec,ntpServer);
+}
+
 String getTimestamp()
 {
-  time_t timeInfo = time(NULL);          //time_t for timestamps
-  struct tm date =*localtime(&timeInfo); //struct tm for datatime struct and access to members
+  struct tm timeInfo;
+  if (!getLocalTime(&timeInfo))
+    Serial.println("Failed to obtain local time");
   char Timeformat[50];                   //char array/string for storing the formatted date
-  strftime(Timeformat, 50, "%H:%M:%S", &date);  //strfttime formatting
+  strftime(Timeformat, 50, "%T", &timeInfo);  //strfttime formatting
   String timeStamp = Timeformat;
   return timeStamp;
 }
@@ -51,6 +63,9 @@ void setup()
 
   //SD
   newFileCreate();
+
+  //NTP server
+  NTPConnect();
   
   //sensor and timer
   pinMode(lightPin, INPUT);
