@@ -22,7 +22,7 @@ int lightValue()
   light = analogRead(lightPin);
   return light;
 }  
-DynamicJsonDocument doc (2*1024) ; //size_1mb
+DynamicJsonDocument doc (2*size_1mb) ; 
 String dataMessage;
 
 //create file if file doesn't exist
@@ -40,10 +40,10 @@ void newFileCreate()
 void setup() 
 {
   Serial.begin(57600);
-  Serial.println("Begin.");
+  //Serial.println("Begin.");
   delay(1000);
-  SPI.begin(16,5,17,4); //SCK,MISO,MOSI,csPin
-  while (!SD.begin(4))                                       
+  SPI.begin(Sck,Miso,Mosi,csPin); //SCK,MISO,MOSI,cs pins
+  while (!SD.begin(csPin))                                       
   {
     Serial.println("Error occurred at SD begin");
     delay(1000);
@@ -55,7 +55,7 @@ void setup()
   //sensor and timer
   pinMode(lightPin, INPUT);
   startTime = millis();
-  Serial.println("check 1 successful");
+  //Serial.println("check 1 successful");
 
 }
 
@@ -67,9 +67,9 @@ void loop() {
   currentTime = millis();
   if ((currentTime-startTime) >= 1000)
   { 
-    if (doc.memoryUsage() <= 2048)    //size_1mb
+    if (doc.memoryUsage() <= size_1mb)    
     {
-      Serial.print(doc.memoryUsage());
+      //Serial.println(doc.memoryUsage());
       doc["Reading"]["Timestamp"] = getTimestamp();
       //testing
       Serial.println(getTimestamp()); 
